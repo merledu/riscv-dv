@@ -239,7 +239,7 @@ class riscv_rand_instr_stream(riscv_instr_stream):
         return instr
 
     def randomize_gpr(self, instr):
-        with instr.randomize_with() as it:
+        with instr.randomize_with(solve_fail_debug=1) as it:
             with vsc.if_then(self.avail_regs.size > 0):
                 with vsc.if_then(instr.has_rs1):
                     instr.rs1.inside(vsc.rangelist(self.avail_regs))
