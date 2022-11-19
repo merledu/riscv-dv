@@ -988,6 +988,15 @@ def load_config(args, cwd):
         elif args.target == "rv32im":
             args.mabi = "ilp32"
             args.isa = "rv32im"
+        elif args.target == "rv32ic":
+            args.mabi = "ilp32"
+            args.isa = "rv32ic"
+        elif args.target == "rv32if":
+            args.mabi = "ilp32"
+            args.isa = "rv32if"
+        elif args.target == "rv32imf":
+            args.mabi = "ilp32"
+            args.isa = "rv32imf"
         else:
             sys.exit("Unsupported pre-defined target: {}".format(args.target))
     else:
