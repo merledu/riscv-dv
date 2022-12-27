@@ -4,16 +4,7 @@ import argparse
 import os
 import re
 import sys
-from icecream import ic
 
-DV_ROOT = os.path.normpath(
-    os.path.join(
-        os.path.dirname(__file__),
-        '../'
-    )
-)
-DV_SCRIPTS = os.path.join(DV_ROOT, 'scripts')
-sys.path.insert(0, DV_SCRIPTS)
 
 from riscv_trace_csv import (
     RiscvInstructionTraceCsv,
