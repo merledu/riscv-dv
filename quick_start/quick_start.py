@@ -8,6 +8,7 @@ sys.path.insert(0, DV_SCRIPTS)
 from core_log_to_trace_csv import process_core_log
 from spike_log_to_trace_csv import process_spike_sim_log
 from instr_trace_compare import compare_trace_csv
+from utils import rem_csr_insts
 
 
 def run_dv(path, target, test, iterations, output_path):
@@ -47,6 +48,10 @@ def logs_to_csv(core_log, core_csv, iss_log, iss_csv):
     os.chdir(SCRIPTS)
     process_core_log(core_log, core_csv, False)
     process_spike_sim_log(iss_log, iss_csv, False)
+
+    # Remove csrs
+    rem_csr_insts(core_csv, core_csv)
+    rem_csr_insts(iss_csv, iss_csv)
     return
 
 
