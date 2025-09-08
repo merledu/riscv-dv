@@ -68,8 +68,8 @@ class riscv_asm_program_gen:
         for hart in range(cfg.num_of_harts):
             sub_program_name = []
             self.instr_stream.append(f"h{int(hart)}_start:")
-            if not cfg.bare_program_mode:
-                self.setup_misa()
+            if not cfg.bare_program_mode: 
+                self.setup_misa() 
                 # Create all page tables
                 self.create_page_table(hart)
                 # Setup privileged mode registers and enter target privileged mode
@@ -229,7 +229,7 @@ class riscv_asm_program_gen:
                       sub_program_name, num_sub_program):
         if num_sub_program != 0:
             callstack_gen = riscv_callstack_gen()
-            self.callstack_gen.init(num_sub_program + 1)
+            callstack_gen.init(num_sub_program + 1)
             if callstack_gen.randomize():
                 idx = 0
                 # Insert the jump instruction based on the call stack
@@ -347,7 +347,7 @@ class riscv_asm_program_gen:
             self.randomize_vec_gpr_and_csr()
         self.core_is_initialized()
         self.gen_dummy_csr_write()
-        if rcs.support_pmp:
+        if not rcs.support_pmp:
             init_string = pkg_ins.indent + "j main"
             self.instr_stream.append(init_string)
 
@@ -802,6 +802,7 @@ class riscv_asm_program_gen:
         tvec_name = tvec.name
         self.gen_section(pkg_ins.get_label("{}_handler".format(tvec_name.lower()), hart), instr)
 
+
         # Exception handler
         instr = []
         if cfg.mtvec_mode == mtvec_mode_t.VECTORED:
@@ -862,7 +863,7 @@ class riscv_asm_program_gen:
             for csr_t in csr_list:
                 self.gen_signature_handshake(
                     instr=intr_handler, signature_type=signature_type_t.WRITE_CSR, csr=csr_t)
-
+  
             # Jump to commmon interrupt handling routine
             intr_handler.extend(("j {}{}mode_intr_handler".format(pkg_ins.hart_prefix(hart), mode),
                                  "1: la x{}, test_done".format(cfg.scratch_reg),
@@ -1128,7 +1129,7 @@ class riscv_asm_program_gen:
 
     def get_directed_instr_stream(self):
         opts = []
-        for i in range(cfg.max_directed_instr_stream_seq):
+        for i in range(cfg.max_directed_instr_stream_seq):  # cfg.max_directed_instr_stream_seq=20 
             arg = "directed_instr_{}".format(i)
             stream_name_opts = "stream_name_{}".format(i)
             stream_freq_opts = "stream_freq_{}".format(i)
@@ -1195,3 +1196,13 @@ class riscv_asm_program_gen:
     def randomize_vec_gpr_and_csr(self):
         # TODO
         pass
+
+    def gen_table(self,hart,mode,instr):
+        instr.extend((".option norvc;", "j {}{}mode_exception_handler".format(
+        pkg_ins.hart_prefix(hart), mode)))
+        # Redirect the interrupt to the corresponding interrupt handler
+        for i in range(1, rcs.max_interrupt_vector_num):
+            instr.append("j {}{}mode_intr_vector_{}".format(pkg_ins.hart_prefix(hart), mode, i))
+        if not cfg.disable_compressed_instr:
+            instr.append(".option rvc;")
+

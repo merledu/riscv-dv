@@ -456,6 +456,7 @@ def gcc_compile(test_list, output_dir, isa, mabi, opts, debug_cmd):
                     test_isa = re.sub(r"(rv.+?)c", r"\1", test_isa)
             # If march/mabi is not defined in the test gcc_opts, use the default
             # setting from the command line.
+            # print(cmd)
             if not re.search('march', cmd):
                 cmd += (" -march={}".format(test_isa))
             if not re.search('mabi', cmd):
@@ -466,7 +467,7 @@ def gcc_compile(test_list, output_dir, isa, mabi, opts, debug_cmd):
             logging.info("Converting to {}".format(binary))
             cmd = ("{} -O binary {} {}".format(
                 get_env_var("RISCV_OBJCOPY", debug_cmd=debug_cmd), elf, binary))
-            run_cmd_output(cmd.split(), debug_cmd=debug_cmd)
+            run_cmd_output(cmd.split(), debug_cmd=debug_cmd)            
 
 
 def run_assembly(asm_test, iss_yaml, isa, mabi, gcc_opts, iss_opts, output_dir,
@@ -1164,12 +1165,13 @@ def main():
                         args.iss_opts,
                         args.isa, args.priv, args.core_setting_dir, args.iss_timeout,
                         args.debug)
-
             # Compare ISS simulation result
             if args.steps == "all" or re.match(".*iss_cmp.*", args.steps):
+
                 iss_cmp(matched_list, args.iss, output_dir,
                         args.stop_on_first_error,
                         args.exp, args.debug)
+                # Creates a report only when exactly two ISS are used
 
         sys.exit(RET_SUCCESS)
     except KeyboardInterrupt:
